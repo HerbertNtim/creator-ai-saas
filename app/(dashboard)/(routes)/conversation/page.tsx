@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 
 import { useRouter } from 'next/navigation'
 
-import OpenAI from 'openai'
+import {ChatCompletionMessageParam} from "openai/resources/chat/completions";
 
 import { useState } from 'react'
 import { useForm } from "react-hook-form"
@@ -21,7 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 const ConversationPage = () => {
   const router = useRouter()
-   const [messages, setMessages] = useState<OpenAI.Chat.ChatCompletionMessageParam[]>([])
+   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([])
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,7 +37,7 @@ const ConversationPage = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       // handling request
-      const userMessage: OpenAI.Chat.ChatCompletionMessageParam = {
+      const userMessage: ChatCompletionMessageParam = {
         role: 'user',
         content: values.prompt
       }
@@ -49,6 +49,8 @@ const ConversationPage = () => {
       const response = await axios.post("/api/conversation", {
         messages: newMessages
       })
+
+      console.log(response.data)
 
     } catch (error) {
       console.log(error)
@@ -112,7 +114,7 @@ const ConversationPage = () => {
         <div className='space-y-4 mt-4'>
           <div className='flex flex-col-reverse gap-y-4'>
             {messages.map((message) => (
-              <div key={message.content}>
+              <div key={message.role}>
                 {message.content}
               </div>
             ))}
